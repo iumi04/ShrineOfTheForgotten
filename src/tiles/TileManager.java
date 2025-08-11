@@ -23,10 +23,10 @@ public class TileManager {
         this.gp = gp;
 
         tile = new Tile[10]; //there are going to be 10 kinds of tiles in the game.
-        mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow]; //to store the tile numbers for each position on the map.
+        mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow]; //to store the tile numbers for each position on the map.
 
         getTileImage();
-        loadMap("/res/maps/map01.txt");
+        loadMap("/res/maps/world01.txt");
     }
 
     public void getTileImage() {
@@ -42,6 +42,15 @@ public class TileManager {
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getResourceAsStream("/res/tiles/water.png"));
 
+            tile[3] = new Tile();
+            tile[3].image = ImageIO.read(getClass().getResourceAsStream("/res/tiles/earth.png")); 
+            
+            tile[4] = new Tile();
+            tile[4].image = ImageIO.read(getClass().getResourceAsStream("/res/tiles/tree.png")); 
+
+            tile[5] = new Tile();
+            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/res/tiles/sand.png"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,18 +63,18 @@ public class TileManager {
 
             int col = 0;
             int row = 0;
-            while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
+            while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
                 String line = br.readLine(); //read a line from the file
 
-                while (col < gp.maxScreenCol) {
+                while (col < gp.maxWorldCol) {
 
                     String numbers[] = line.split(" "); 
                     int num = Integer.parseInt(numbers[col]); 
                     mapTileNum[col][row] = num; //store the number in the mapTileNum array
                     col++;
                 }  
-                if (col == gp.maxScreenCol) { 
+                if (col == gp.maxWorldCol) { 
                     //if we reach the end of the row
                     col = 0; 
                     row++; //move to next 
@@ -81,25 +90,36 @@ public class TileManager {
     public void draw(Graphics2D g2) {
         
         // g2.drawImage(tile[0].image, 0, 0, gp.tileSize, gp.tileSize, null); draws the grass tile at (0,0) with the size of tileSize.
-        int col = 0;
-        int row = 0;
-        int x = 0;
-        int y = 0;
+        int worldCol = 0;
+        int worldRow = 0;
 
-        while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
+        while (worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
 
-            int tileNum = mapTileNum[col][row]; //get the tile number from the mapTileNum array
+            int tileNum = mapTileNum[worldCol][worldRow]; //get the tile number from the mapTileNum array
 
-            g2.drawImage(tile[tileNum].image, x, y, gp.tileSize, gp.tileSize, null); 
-            col++;
-            x += gp.tileSize; //move to the next column
+            int worldX = worldCol * gp.tileSize; 
+            int worldY = worldRow * gp.tileSize; //x and y position of the tile
+            int screenX = worldX - gp.player.worldX + gp.player.screenX; 
+            int screenY = worldY - gp.player.worldY + gp.player.screenY; //add player screenX and screenY to center the tile on the screen even when the player is at the corner (offset the difference logic).
 
-            if (col == gp.maxScreenCol) { 
+
+            //only load what is visible to the player to save memory and not make the game laggy.
+            if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && 
+                worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
+                worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
+                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
+                //if the tile is within the player's view (+-1 tile to remove the black background/border)
+
+                g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null); 
+
+            } 
+
+            worldCol++;
+
+            if (worldCol == gp.maxWorldCol) { 
                 //if we reach the end of the row
-                col = 0; 
-                x = 0; 
-                row++; //move to next row
-                y += gp.tileSize; //move down by tile size
+                worldCol = 0; 
+                worldRow++; //move to next row
             }
         }
     }

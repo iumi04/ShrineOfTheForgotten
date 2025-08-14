@@ -15,5 +15,6 @@ public class Entity {
     public int spriteNum = 1; //used to change the sprite every few frames
 
     public Rectangle solidArea; //used to detect collisions
+    public int solidAreaDefaultX, solidAreaDefaultY; //used to reset the solid area position
     public boolean collisionOn = false;
 }

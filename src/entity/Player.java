@@ -127,17 +127,24 @@ public class Player extends Entity {
             
             switch (objectName) {
                 case "Key":
+                    gp.playSE(1);
                     hasKey++;
                     gp.obj[index] = null; //remove the object from the game
                     System.out.println("Key: " + hasKey);   
                     break;
                 case "Door":
                     if (hasKey > 0) {
+                        gp.playSE(3); //play the unlock sound effect
                         gp.obj[index] = null; 
                         hasKey--; //use a key to open the door
                     System.out.println("Key: " + hasKey);   
                     break;
                     }
+                case "Boots":
+                    gp.playSE(2);
+                    speed += 1;
+                    gp.obj[index] = null; 
+                    break;
             }
             
         }

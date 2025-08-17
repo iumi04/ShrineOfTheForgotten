@@ -22,6 +22,7 @@ public class Player extends Entity {
     public final int screenX; 
     public final int screenY; 
     public int hasKey = 0; 
+    int standCounter = 0; //to control the standing still animation
 
     public Player(GamePanel gp, KeyHandler keyH) {
 
@@ -116,6 +117,14 @@ public class Player extends Entity {
                 spriteCounter = 0; //reset the counter
 
             }
+        }
+        else {
+            standCounter++;
+            if (standCounter == 30) { //if the player is standing still for 20 frames
+                spriteNum = 1; 
+                standCounter = 0; 
+            }
+
         }
 
     }
